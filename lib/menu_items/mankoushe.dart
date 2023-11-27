@@ -97,7 +97,6 @@ class _MankousheState extends State<Mankoushe> {
     'Lahme': 200,
   };
 
-  bool showButton = true;
   double finalPrice = 0.0;
 
   @override
@@ -108,7 +107,7 @@ class _MankousheState extends State<Mankoushe> {
           "Mankoushe",
           style: TextStyle(
             color: Colors.brown,
-            fontSize: 30,
+            fontSize: 35,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -271,7 +270,6 @@ class _MankousheState extends State<Mankoushe> {
           const SizedBox(
             height: 20,
           ),
-          if (showButton)
             GestureDetector(
               onTap: () {
                 setState(() {
@@ -279,8 +277,7 @@ class _MankousheState extends State<Mankoushe> {
                       typePrices[selectedType]! *
                       1000 *
                       quantity;
-                  showSnackbar(context, "The final price is: $finalPrice LBP");
-                  showButton = true;
+                  showSnackbar(context, "Order Confirmed.\nYour Order: ${quantity}x $selectedSize Mankoushe $selectedType.\nThe final price is: $finalPrice LBP.\nOrder will be ready soon.");
                 });
               },
               child: submitButton("Made Your Mind?"),
@@ -296,14 +293,14 @@ class _MankousheState extends State<Mankoushe> {
         content: Text(
           message,
           style: const TextStyle(
-            fontSize: 16.0,
+            fontSize: 18.0,
             color: Colors.white,
           ),
         ),
-        backgroundColor: Colors.green, // Customize the background color
-        duration: const Duration(seconds: 5),
+        backgroundColor: Colors.green, // background color
+        duration: const Duration(seconds: 7),// duration for snackbar
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0), // Customize the border radius
+          borderRadius: BorderRadius.circular(10.0), // border radius
         ),
       ),
     );

@@ -3,9 +3,10 @@ import '../widgets/common_widget.dart';
 import '../menu.dart';
 
 class QuantityWidget extends StatefulWidget {
-  //get quantity {
-  //return quantity;
-  //}
+  final int initialQuantity;
+  final Function(int) onQuantityChanged;
+
+  QuantityWidget({required this.initialQuantity, required this.onQuantityChanged});
 
   @override
   _QuantityWidgetState createState() => _QuantityWidgetState();
@@ -17,6 +18,7 @@ class _QuantityWidgetState extends State<QuantityWidget> {
   void increaseQuantity() {
     setState(() {
       quantity++;
+      widget.onQuantityChanged(quantity);
     });
   }
 
@@ -24,9 +26,12 @@ class _QuantityWidgetState extends State<QuantityWidget> {
     setState(() {
       if (quantity > 1) {
         quantity--;
+        widget.onQuantityChanged(quantity);
       }
     });
   }
+
+  int get getquantity => quantity;
 
 
   @override
@@ -79,7 +84,7 @@ class Croissant extends StatefulWidget {
 
 class _CroissantState extends State<Croissant> {
   String selectedType="";
-  //QuantityWidget quantityWidget = QuantityWidget();
+  int quantity = 1;
 
 
   final Map<String, double> typeprices = {
@@ -91,7 +96,6 @@ class _CroissantState extends State<Croissant> {
     'Kinder': 120,
   };
 
-  bool showButton = true;
   double finalPrice = 0.0;
 
   @override
@@ -102,7 +106,7 @@ class _CroissantState extends State<Croissant> {
           "Croissant",
           style: TextStyle(
             color: Colors.brown,
-            fontSize: 30,
+            fontSize: 35,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -132,7 +136,14 @@ class _CroissantState extends State<Croissant> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  QuantityWidget(),  // Replace the existing Quantity row with QuantityWidget
+                  QuantityWidget(
+                    initialQuantity: 1,
+                    onQuantityChanged: (newQuantity) {
+                      setState(() {
+                        quantity = newQuantity;
+                      });
+                    },
+                  ),
                   const SizedBox(height: 10),
                   const Text(
                     "Type",
@@ -244,26 +255,39 @@ class _CroissantState extends State<Croissant> {
             const SizedBox(
               height: 20,
             ),
-            if (showButton)
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    finalPrice = typeprices[selectedType]!*1000;
-                    showButton = false;
-                  });
-                },
-                child: submitButton("Made Your Mind?"),
-              ),
-            if (!showButton)
-              Text(
-                "The final price is: $finalPrice LBP",
-                style: const TextStyle(
-                  color: Colors.brown,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  finalPrice =
+                      typeprices[selectedType]! *
+                      1000 *
+                      quantity;
+                  showSnackbar(context, "Order Confirmed.\nYour Order: ${quantity}x Croissant $selectedType.\nThe final price is: $finalPrice LBP.\nOrder will be ready soon.");
+                });
+              },
+              child: submitButton("Made Your Mind?"),
+            ),
           ],
-        ));
+        ),
+    );
+  }
+
+  void showSnackbar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(
+            fontSize: 18.0,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.green, // background color
+        duration: const Duration(seconds: 7),// duration for snackbar
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0), // border radius
+        ),
+      ),
+    );
   }
 }

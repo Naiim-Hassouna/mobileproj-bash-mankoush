@@ -21,7 +21,5 @@ void main() => runApp(MaterialApp(
     "/menu_items/croissant": (context) => Croissant(),
     "/menu_items/donut": (context) => Donut(),
     "/menu_items/bread": (context) => Bread(),
-
-
   },
 ));

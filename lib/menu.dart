@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'details.dart';
 
 class Menu extends StatelessWidget {
@@ -32,6 +31,7 @@ class Menu extends StatelessWidget {
         ),
         backgroundColor: const Color.fromRGBO(247, 205, 120, 100),
         toolbarHeight: 100,
+        elevation: 0,
           actions: [
       Padding(
         padding: const EdgeInsets.only(right: 0.0),
@@ -118,7 +118,6 @@ class Menu extends StatelessWidget {
                           pageRoute = '/menu';
                           break;
                       }
-
                       // Navigate to the determined page
                       Navigator.of(context).pushNamed(pageRoute);
                     },
