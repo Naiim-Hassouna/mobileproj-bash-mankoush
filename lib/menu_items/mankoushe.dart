@@ -14,6 +14,8 @@ class QuantityWidget extends StatefulWidget {
 class _QuantityWidgetState extends State<QuantityWidget> {
   int quantity = 1;
 
+
+
   void increaseQuantity() {
     setState(() {
       quantity++;

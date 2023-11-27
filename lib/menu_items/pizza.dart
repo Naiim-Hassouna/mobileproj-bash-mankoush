@@ -3,6 +3,73 @@ import '../widgets/common_widget.dart';
 import '../menu.dart';
 
 
+class QuantityWidget extends StatefulWidget {
+  //get quantity {
+  //return quantity;
+  //}
+
+  @override
+  _QuantityWidgetState createState() => _QuantityWidgetState();
+}
+
+class _QuantityWidgetState extends State<QuantityWidget> {
+  int quantity = 1;
+
+  void increaseQuantity() {
+    setState(() {
+      quantity++;
+    });
+  }
+
+  void decreaseQuantity() {
+    setState(() {
+      if (quantity > 1) {
+        quantity--;
+      }
+    });
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Text(
+          "Quantity",
+          style: TextStyle(
+            color: Colors.brown,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const Spacer(),
+        Row(
+          children: [
+            GestureDetector(
+              onTap: decreaseQuantity,
+              child: const Icon(Icons.remove),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: Text(
+                quantity.toString(),
+                style: const TextStyle(
+                  fontSize: 20,
+                  color: Colors.brown,
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: increaseQuantity,
+              child: const Icon(Icons.add),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
 class Pizza extends StatefulWidget {
   const Pizza({super.key});
 
@@ -17,7 +84,6 @@ class _PizzaState extends State<Pizza> {
 
 
   final Map<String, double> sizeprices = {
-    'Small':0.8,
     'Medium': 1,
     'Large': 1.5,
   };
@@ -67,6 +133,7 @@ class _PizzaState extends State<Pizza> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 10),
+                  QuantityWidget(),
                   const Text(
                     "Size",
                     style: TextStyle(
@@ -74,22 +141,6 @@ class _PizzaState extends State<Pizza> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
-                  ),
-                  RadioListTile(
-                    title: const Text('Small',
-                      style: TextStyle(
-                        color: Colors.brown,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    value: 'Small',
-                    groupValue: selectedSize,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedSize = value!;
-                      });
-                    },
                   ),
                   RadioListTile(
                     title: const Text('Medium',

@@ -134,8 +134,8 @@ class _DonutState extends State<Donut> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  QuantityWidget(),  // Replace the existing Quantity row with QuantityWidget
                   const SizedBox(height: 10),
+                  QuantityWidget(),  
                   const Text(
                     "Filling",
                     style: TextStyle(
