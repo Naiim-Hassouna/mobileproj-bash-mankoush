@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'details.dart';
 
 class Menu extends StatelessWidget {
   const Menu({super.key});

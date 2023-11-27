@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home.dart';
 import 'menu.dart';
-import 'details.dart';
 import 'menu_items/mankoushe.dart';
 import 'menu_items/pizza.dart';
 import 'menu_items/croissant.dart';
@@ -15,7 +14,6 @@ void main() => runApp(MaterialApp(
   routes: {
     "/": (context) => Home(),
     "/menu": ((context) => Menu()),
-    '/details': (context) => Details(),
     "/menu_items/mankoushe": (context) => Mankoushe(),
     "/menu_items/pizza": (context) => Pizza(),
     "/menu_items/croissant": (context) => Croissant(),
