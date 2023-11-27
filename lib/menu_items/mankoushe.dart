@@ -3,9 +3,10 @@ import '../widgets/common_widget.dart';
 import '../menu.dart';
 
 class QuantityWidget extends StatefulWidget {
-  //get quantity {
-    //return quantity;
-  //}
+  final int initialQuantity;
+  final Function(int) onQuantityChanged;
+
+  QuantityWidget({required this.initialQuantity, required this.onQuantityChanged});
 
   @override
   _QuantityWidgetState createState() => _QuantityWidgetState();
@@ -14,11 +15,10 @@ class QuantityWidget extends StatefulWidget {
 class _QuantityWidgetState extends State<QuantityWidget> {
   int quantity = 1;
 
-
-
   void increaseQuantity() {
     setState(() {
       quantity++;
+      widget.onQuantityChanged(quantity);
     });
   }
 
@@ -26,10 +26,12 @@ class _QuantityWidgetState extends State<QuantityWidget> {
     setState(() {
       if (quantity > 1) {
         quantity--;
+        widget.onQuantityChanged(quantity);
       }
     });
   }
 
+  int get getquantity => quantity;
 
   @override
   Widget build(BuildContext context) {
@@ -71,25 +73,24 @@ class _QuantityWidgetState extends State<QuantityWidget> {
   }
 }
 
-
 class Mankoushe extends StatefulWidget {
-  const Mankoushe({super.key});
+  const Mankoushe({Key? key}) : super(key: key);
 
   @override
   _MankousheState createState() => _MankousheState();
 }
 
 class _MankousheState extends State<Mankoushe> {
-  String selectedSize="";
-  String selectedType="";
-  //QuantityWidget quantityWidget = QuantityWidget();
+  String selectedSize = "";
+  String selectedType = "";
+  int quantity = 1;
 
-
-  final Map<String, double> sizeprices = {
+  final Map<String, double> sizePrices = {
     'Medium': 1,
     'Large': 1.5,
   };
-  final Map<String, double> typeprices = {
+
+  final Map<String, double> typePrices = {
     'Zaatar': 50,
     'Jebne': 150,
     'Keshek': 175,
@@ -137,7 +138,14 @@ class _MankousheState extends State<Mankoushe> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                QuantityWidget(),  // Replace the existing Quantity row with QuantityWidget
+                QuantityWidget(
+                  initialQuantity: 1,
+                  onQuantityChanged: (newQuantity) {
+                    setState(() {
+                      quantity = newQuantity;
+                    });
+                  },
+                ),
                 const SizedBox(height: 10),
                 const Text(
                   "Size",
@@ -148,7 +156,8 @@ class _MankousheState extends State<Mankoushe> {
                   ),
                 ),
                 RadioListTile(
-                  title: const Text('Medium',
+                  title: const Text(
+                    'Medium',
                     style: TextStyle(
                       color: Colors.brown,
                       fontSize: 18,
@@ -159,12 +168,13 @@ class _MankousheState extends State<Mankoushe> {
                   groupValue: selectedSize,
                   onChanged: (value) {
                     setState(() {
-                      selectedSize = value!;
+                      selectedSize = value.toString();
                     });
                   },
                 ),
                 RadioListTile(
-                  title: const Text('Large',
+                  title: const Text(
+                    'Large',
                     style: TextStyle(
                       color: Colors.brown,
                       fontSize: 18,
@@ -175,7 +185,7 @@ class _MankousheState extends State<Mankoushe> {
                   groupValue: selectedSize,
                   onChanged: (value) {
                     setState(() {
-                      selectedSize = value!;
+                      selectedSize = value.toString();
                     });
                   },
                 ),
@@ -188,7 +198,8 @@ class _MankousheState extends State<Mankoushe> {
                   ),
                 ),
                 RadioListTile(
-                  title: const Text('Zaatar',
+                  title: const Text(
+                    'Zaatar',
                     style: TextStyle(
                       color: Colors.brown,
                       fontSize: 18,
@@ -199,12 +210,13 @@ class _MankousheState extends State<Mankoushe> {
                   groupValue: selectedType,
                   onChanged: (value) {
                     setState(() {
-                      selectedType = value!;
+                      selectedType = value.toString();
                     });
                   },
                 ),
                 RadioListTile(
-                  title: const Text('Jebne',
+                  title: const Text(
+                    'Jebne',
                     style: TextStyle(
                       color: Colors.brown,
                       fontSize: 18,
@@ -215,12 +227,13 @@ class _MankousheState extends State<Mankoushe> {
                   groupValue: selectedType,
                   onChanged: (value) {
                     setState(() {
-                      selectedType = value!;
+                      selectedType = value.toString();
                     });
                   },
                 ),
                 RadioListTile(
-                  title: const Text('Keshek',
+                  title: const Text(
+                    'Keshek',
                     style: TextStyle(
                       color: Colors.brown,
                       fontSize: 18,
@@ -231,11 +244,13 @@ class _MankousheState extends State<Mankoushe> {
                   groupValue: selectedType,
                   onChanged: (value) {
                     setState(() {
-                      selectedType = value!;
+                      selectedType = value.toString();
                     });
                   },
-                ),RadioListTile(
-                  title: const Text('Lahme',
+                ),
+                RadioListTile(
+                  title: const Text(
+                    'Lahme',
                     style: TextStyle(
                       color: Colors.brown,
                       fontSize: 18,
@@ -246,7 +261,7 @@ class _MankousheState extends State<Mankoushe> {
                   groupValue: selectedType,
                   onChanged: (value) {
                     setState(() {
-                      selectedType = value!;
+                      selectedType = value.toString();
                     });
                   },
                 ),
@@ -256,26 +271,41 @@ class _MankousheState extends State<Mankoushe> {
           const SizedBox(
             height: 20,
           ),
-    if (showButton)
-    GestureDetector(
-    onTap: () {
-    setState(() {
-    finalPrice = sizeprices[selectedSize]! * typeprices[selectedType]!*1000;
-    showButton = false;
-    });
-    },
-    child: submitButton("Made Your Mind?"),
-    ),
-    if (!showButton)
-    Text(
-    "The final price is: $finalPrice LBP",
-      style: const TextStyle(
-        color: Colors.brown,
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
+          if (showButton)
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  finalPrice = sizePrices[selectedSize]! *
+                      typePrices[selectedType]! *
+                      1000 *
+                      quantity;
+                  showSnackbar(context, "The final price is: $finalPrice LBP");
+                  showButton = true;
+                });
+              },
+              child: submitButton("Made Your Mind?"),
+            ),
+        ],
       ),
-    ),
-    ],
-    ));
+    );
+  }
+
+  void showSnackbar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(
+            fontSize: 16.0,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.green, // Customize the background color
+        duration: const Duration(seconds: 5),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0), // Customize the border radius
+        ),
+      ),
+    );
   }
 }

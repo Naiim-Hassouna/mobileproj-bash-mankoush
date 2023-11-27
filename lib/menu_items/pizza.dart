@@ -91,7 +91,7 @@ class _PizzaState extends State<Pizza> {
     'Margherita': 100,
     'Pepperoni': 100,
     'BBQ Chicken Pizza': 200,
-    'Cheese': 150,
+    '4 Cheese': 150,
   };
 
   bool showButton = true;
@@ -230,14 +230,14 @@ class _PizzaState extends State<Pizza> {
                       });
                     },
                   ),RadioListTile(
-                    title: const Text('Cheese',
+                    title: const Text('4 Cheese',
                       style: TextStyle(
                         color: Colors.brown,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    value: 'Cheese',
+                    value: '4 Cheese',
                     groupValue: selectedType,
                     onChanged: (value) {
                       setState(() {
