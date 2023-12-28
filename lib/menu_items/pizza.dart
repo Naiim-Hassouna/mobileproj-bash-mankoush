@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/common_widget.dart';
-import '../menu.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class QuantityWidget extends StatefulWidget {
   final int initialQuantity;
@@ -75,30 +75,54 @@ class _QuantityWidgetState extends State<QuantityWidget> {
 }
 
 class Pizza extends StatefulWidget {
-  const Pizza({super.key});
+  const Pizza({Key? key}) : super(key: key);
 
   @override
   _PizzaState createState() => _PizzaState();
 }
 
 class _PizzaState extends State<Pizza> {
-  String selectedSize="";
-  String selectedType="";
+  String selectedSize = "";
+  String selectedType = "";
   int quantity = 1;
 
-
-  final Map<String, double> sizeprices = {
+  final Map<String, double> sizePrices = {
     'Medium': 1,
     'Large': 1.5,
   };
-  final Map<String, double> typeprices = {
-    'Margherita': 100,
-    'Pepperoni': 100,
-    'BBQ Chicken': 200,
-    '4 Cheese': 150,
-  };
+
+  List<Map<String, dynamic>> items = [];
 
   double finalPrice = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch items from the database when the widget is created
+    fetchItems();
+  }
+
+  Future<void> fetchItems() async {
+    final response = await http.get(Uri.parse('https://bash-mankoush.000webhostapp.com/fetch_pizza.php'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+
+      // Extract item names and prices from the response
+      for (var item in data) {
+        items.add({
+          'name': item['name'],
+          'price': item['price'],
+        });
+      }
+
+      // Update the state to trigger a rebuild with the fetched data
+      setState(() {});
+    } else {
+      // Handle server error
+      print('Server error: ${response.statusCode}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,159 +146,124 @@ class _PizzaState extends State<Pizza> {
 
   Widget content(BuildContext context) {
     return Center(
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              height: 150,
-              color: Colors.brown[50],
-              child: Image.asset('assets/pizza.jpg'),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 10),
-                  QuantityWidget(
-                    initialQuantity: 1,
-                    onQuantityChanged: (newQuantity) {
-                      setState(() {
-                        quantity = newQuantity;
-                      });
-                    },
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            height: 150,
+            color: Colors.brown[50],
+            child: Image.asset('assets/pizza.jpg'),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                QuantityWidget(
+                  initialQuantity: 1,
+                  onQuantityChanged: (newQuantity) {
+                    setState(() {
+                      quantity = newQuantity;
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  "Size",
+                  style: TextStyle(
+                    color: Colors.brown,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const Text(
-                    "Size",
+                ),
+                RadioListTile(
+                  title: const Text(
+                    'Medium',
                     style: TextStyle(
                       color: Colors.brown,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  RadioListTile(
-                    title: const Text('Medium',
-                      style: TextStyle(
-                        color: Colors.brown,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    value: 'Medium',
-                    groupValue: selectedSize,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedSize = value!;
-                      });
-                    },
-                  ),
-                  RadioListTile(
-                    title: const Text('Large',
-                      style: TextStyle(
-                        color: Colors.brown,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    value: 'Large',
-                    groupValue: selectedSize,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedSize = value!;
-                      });
-                    },
-                  ),
-                  const Text(
-                    "Type",
+                  value: 'Medium',
+                  groupValue: selectedSize,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedSize = value.toString();
+                    });
+                  },
+                ),
+                RadioListTile(
+                  title: const Text(
+                    'Large',
                     style: TextStyle(
                       color: Colors.brown,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  value: 'Large',
+                  groupValue: selectedSize,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedSize = value.toString();
+                    });
+                  },
+                ),
+                const Text(
+                  "Type",
+                  style: TextStyle(
+                    color: Colors.brown,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                // Use the fetched items to dynamically generate RadioListTile widgets
+                for (var item in items)
                   RadioListTile(
-                    title: const Text('Margherita',
-                      style: TextStyle(
+                    title: Text(
+                      item['name'],
+                      style: const TextStyle(
                         color: Colors.brown,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    value: 'Margherita',
+                    value: item['name'],
                     groupValue: selectedType,
                     onChanged: (value) {
                       setState(() {
-                        selectedType = value!;
+                        selectedType = value.toString();
                       });
                     },
                   ),
-                  RadioListTile(
-                    title: const Text('Pepperoni',
-                      style: TextStyle(
-                        color: Colors.brown,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    value: 'Pepperoni',
-                    groupValue: selectedType,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedType = value!;
-                      });
-                    },
-                  ),
-                  RadioListTile(
-                    title: const Text('BBQ Chicken',
-                      style: TextStyle(
-                        color: Colors.brown,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    value: 'BBQ Chicken',
-                    groupValue: selectedType,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedType = value!;
-                      });
-                    },
-                  ),RadioListTile(
-                    title: const Text('4 Cheese',
-                      style: TextStyle(
-                        color: Colors.brown,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    value: '4 Cheese',
-                    groupValue: selectedType,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedType = value!;
-                      });
-                    },
-                  ),
-                ],
-              ),
+              ],
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  finalPrice = sizeprices[selectedSize]! *
-                      typeprices[selectedType]! *
-                      1000 *
-                      quantity;
-                  showSnackbar(context, "Order Confirmed.\nYour Order: ${quantity}x $selectedSize $selectedType Pizza.\nThe final price is: $finalPrice LBP.\nOrder will be ready soon.");
-                });
-              },
-              child: submitButton("Made Your Mind?"),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                final selectedPrice = int.parse(items.firstWhere((item) => item['name'] == selectedType)['price']);
+                final sizeMultiplier = sizePrices[selectedSize] ?? 1.0;
+
+                // Calculate the final price
+                finalPrice = selectedPrice * quantity * sizeMultiplier * 1000;
+
+                showSnackbar(context,
+                    "Order Confirmed.\nYour Order: ${quantity}x $selectedSize Pizza $selectedType.\nThe final price is: $finalPrice LBP.\nOrder will be ready soon.");
+              });
+            },
+            child: submitButton("Made Your Mind?"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -289,7 +278,7 @@ class _PizzaState extends State<Pizza> {
           ),
         ),
         backgroundColor: Colors.green, // background color
-        duration: const Duration(seconds: 7),// duration for snackbar
+        duration: const Duration(seconds: 7), // duration for snackbar
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0), // border radius
         ),

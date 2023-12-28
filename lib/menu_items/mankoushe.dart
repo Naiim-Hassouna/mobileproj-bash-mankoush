@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/common_widget.dart';
-import '../menu.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class QuantityWidget extends StatefulWidget {
   final int initialQuantity;
@@ -90,14 +91,38 @@ class _MankousheState extends State<Mankoushe> {
     'Large': 1.5,
   };
 
-  final Map<String, double> typePrices = {
-    'Zaatar': 50,
-    'Jebne': 150,
-    'Keshek': 175,
-    'Lahme': 200,
-  };
+  List<Map<String, dynamic>> items = [];
 
   double finalPrice = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch items from the database when the widget is created
+    fetchItems();
+  }
+
+  Future<void> fetchItems() async {
+    final response = await http.get(Uri.parse('https://bash-mankoush.000webhostapp.com/fetch_mankoushe.php'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+
+      // Extract item names and prices from the response
+      for (var item in data) {
+        items.add({
+          'name': item['name'],
+          'price': item['price'],
+        });
+      }
+
+      // Update the state to trigger a rebuild with the fetched data
+      setState(() {});
+    } else {
+      // Handle server error
+      print('Server error: ${response.statusCode}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -196,92 +221,49 @@ class _MankousheState extends State<Mankoushe> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                RadioListTile(
-                  title: const Text(
-                    'Zaatar',
-                    style: TextStyle(
-                      color: Colors.brown,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+
+                // Use the fetched items to dynamically generate RadioListTile widgets
+                for (var item in items)
+                  RadioListTile(
+                    title: Text(
+                      item['name'],
+                      style: const TextStyle(
+                        color: Colors.brown,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
+                    value: item['name'],
+                    groupValue: selectedType,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedType = value.toString();
+                      });
+                    },
                   ),
-                  value: 'Zaatar',
-                  groupValue: selectedType,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedType = value.toString();
-                    });
-                  },
-                ),
-                RadioListTile(
-                  title: const Text(
-                    'Jebne',
-                    style: TextStyle(
-                      color: Colors.brown,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  value: 'Jebne',
-                  groupValue: selectedType,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedType = value.toString();
-                    });
-                  },
-                ),
-                RadioListTile(
-                  title: const Text(
-                    'Keshek',
-                    style: TextStyle(
-                      color: Colors.brown,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  value: 'Keshek',
-                  groupValue: selectedType,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedType = value.toString();
-                    });
-                  },
-                ),
-                RadioListTile(
-                  title: const Text(
-                    'Lahme',
-                    style: TextStyle(
-                      color: Colors.brown,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  value: 'Lahme',
-                  groupValue: selectedType,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedType = value.toString();
-                    });
-                  },
-                ),
               ],
             ),
           ),
           const SizedBox(
             height: 20,
           ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  finalPrice = sizePrices[selectedSize]! *
-                      typePrices[selectedType]! *
-                      1000 *
-                      quantity;
-                  showSnackbar(context, "Order Confirmed.\nYour Order: ${quantity}x $selectedSize Mankoushe $selectedType.\nThe final price is: $finalPrice LBP.\nOrder will be ready soon.");
-                });
-              },
-              child: submitButton("Made Your Mind?"),
-            ),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                final selectedPrice = int.parse(items.firstWhere((item) => item['name'] == selectedType)['price']);
+                final sizeMultiplier = sizePrices[selectedSize] ?? 1.0;
+
+                // Calculate the final price
+                finalPrice = selectedPrice * quantity * sizeMultiplier * 1000;
+
+                showSnackbar(context,
+                    "Order Confirmed.\nYour Order: ${quantity}x $selectedSize Mankoushe $selectedType.\nThe final price is: $finalPrice LBP.\nOrder will be ready soon.");
+              });
+            },
+            child: submitButton("Made Your Mind?"),
+          ),
+
+
         ],
       ),
     );
@@ -297,8 +279,8 @@ class _MankousheState extends State<Mankoushe> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: Colors.green, // background color
-        duration: const Duration(seconds: 7),// duration for snackbar
+        backgroundColor: Colors.green, // Set the background color explicitly
+        duration: const Duration(seconds: 7), // duration for snackbar
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0), // border radius
         ),

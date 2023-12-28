@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/common_widget.dart';
-import '../menu.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class QuantityWidget extends StatefulWidget {
   final int initialQuantity;
@@ -32,7 +33,6 @@ class _QuantityWidgetState extends State<QuantityWidget> {
   }
 
   int get getquantity => quantity;
-
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +74,6 @@ class _QuantityWidgetState extends State<QuantityWidget> {
   }
 }
 
-
 class Croissant extends StatefulWidget {
   const Croissant({super.key});
 
@@ -83,20 +82,42 @@ class Croissant extends StatefulWidget {
 }
 
 class _CroissantState extends State<Croissant> {
-  String selectedType="";
+  String selectedType = "";
   int quantity = 1;
 
 
-  final Map<String, double> typeprices = {
-    'Zaatar': 50,
-    'Jebne': 75,
-    'Chocolate': 75,
-    'Fahita': 75,
-    'Pizza': 75,
-    'Kinder': 120,
-  };
+  List<Map<String, dynamic>> items = [];
 
   double finalPrice = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch items from the database when the widget is created
+    fetchItems();
+  }
+
+  Future<void> fetchItems() async {
+    final response = await http.get(Uri.parse('https://bash-mankoush.000webhostapp.com/fetch_croissant.php'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+
+      // Extract item names and prices from the response
+      for (var item in data) {
+        items.add({
+          'name': item['name'],
+          'price': item['price'],
+        });
+      }
+
+      // Update the state to trigger a rebuild with the fetched data
+      setState(() {});
+    } else {
+      // Handle server error
+      print('Server error: ${response.statusCode}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,155 +141,80 @@ class _CroissantState extends State<Croissant> {
 
   Widget content(BuildContext context) {
     return Center(
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              height: 150,
-              color: Colors.brown[50],
-              child: Image.asset('assets/croissant.png'),
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            height: 150,
+            color: Colors.brown[50],
+            child: Image.asset('assets/croissant.png'),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                QuantityWidget(
+                  initialQuantity: 1,
+                  onQuantityChanged: (newQuantity) {
+                    setState(() {
+                      quantity = newQuantity;
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  "Type",
+                  style: TextStyle(
+                    color: Colors.brown,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                // Use the fetched items to dynamically generate RadioListTile widgets
+                for (var item in items)
+                  RadioListTile(
+                    title: Text(
+                      item['name'],
+                      style: const TextStyle(
+                        color: Colors.brown,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    value: item['name'],
+                    groupValue: selectedType,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedType = value.toString();
+                      });
+                    },
+                  ),
+              ],
             ),
-            const SizedBox(
-              height: 20,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  QuantityWidget(
-                    initialQuantity: 1,
-                    onQuantityChanged: (newQuantity) {
-                      setState(() {
-                        quantity = newQuantity;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    "Type",
-                    style: TextStyle(
-                      color: Colors.brown,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  RadioListTile(
-                    title: const Text('Zaatar',
-                      style: TextStyle(
-                        color: Colors.brown,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    value: 'Zaatar',
-                    groupValue: selectedType,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedType = value!;
-                      });
-                    },
-                  ),
-                  RadioListTile(
-                    title: const Text('Jebne',
-                      style: TextStyle(
-                        color: Colors.brown,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    value: 'Jebne',
-                    groupValue: selectedType,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedType = value!;
-                      });
-                    },
-                  ),
-                  RadioListTile(
-                    title: const Text('Chocolate',
-                      style: TextStyle(
-                        color: Colors.brown,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    value: 'Chocolate',
-                    groupValue: selectedType,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedType = value!;
-                      });
-                    },
-                  ),
-                  RadioListTile(
-                    title: const Text('Fahita',
-                      style: TextStyle(
-                        color: Colors.brown,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    value: 'Fahita',
-                    groupValue: selectedType,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedType = value!;
-                      });
-                    },
-                  ),
-                  RadioListTile(
-                    title: const Text('Pizza',
-                      style: TextStyle(
-                        color: Colors.brown,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    value: 'Pizza',
-                    groupValue: selectedType,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedType = value!;
-                      });
-                    },
-                  ),
-                  RadioListTile(
-                    title: const Text('Kinder',
-                      style: TextStyle(
-                        color: Colors.brown,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    value: 'Kinder',
-                    groupValue: selectedType,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedType = value!;
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  finalPrice =
-                      typeprices[selectedType]! *
-                      1000 *
-                      quantity;
-                  showSnackbar(context, "Order Confirmed.\nYour Order: ${quantity}x Croissant $selectedType.\nThe final price is: $finalPrice LBP.\nOrder will be ready soon.");
-                });
-              },
-              child: submitButton("Made Your Mind?"),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                final selectedPrice = int.parse(items.firstWhere((item) => item['name'] == selectedType)['price']);
+                // Calculate the final price
+                finalPrice = selectedPrice * quantity * 1000;
+
+                showSnackbar(context,
+                    "Order Confirmed.\nYour Order: ${quantity}x Croissant $selectedType.\nThe final price is: $finalPrice LBP.\nOrder will be ready soon.");
+              });
+            },
+            child: submitButton("Made Your Mind?"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -283,7 +229,7 @@ class _CroissantState extends State<Croissant> {
           ),
         ),
         backgroundColor: Colors.green, // background color
-        duration: const Duration(seconds: 7),// duration for snackbar
+        duration: const Duration(seconds: 7), // duration for snackbar
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0), // border radius
         ),
