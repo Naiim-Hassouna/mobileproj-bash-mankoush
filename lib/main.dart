@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'home.dart';
 import 'menu.dart';
@@ -6,13 +7,16 @@ import 'menu_items/pizza.dart';
 import 'menu_items/croissant.dart';
 import 'menu_items/donut.dart';
 import 'menu_items/bread.dart';
-
+import 'login.dart';
+import 'register.dart';
 
 
 void main() => runApp(MaterialApp(
   debugShowCheckedModeBanner: false,
   routes: {
-    "/": (context) => Home(),
+    "/": (context) => LoginPage(),
+    "/register": (context) => RegisterPage(),
+    "/home" : (context) => Home(),
     "/menu": ((context) => Menu()),
     "/menu_items/mankoushe": (context) => Mankoushe(),
     "/menu_items/pizza": (context) => Pizza(),
