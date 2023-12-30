@@ -16,6 +16,7 @@ void main() => runApp(MaterialApp(
   routes: {
     "/": (context) => LoginPage(),
     "/register": (context) => RegisterPage(),
+    "/login": (context) => LoginPage(),
     "/home" : (context) => Home(),
     "/menu": ((context) => Menu()),
     "/menu_items/mankoushe": (context) => Mankoushe(),
