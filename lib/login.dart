@@ -10,7 +10,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'My App',
       home: LoginPage(),
     );
   }
@@ -25,7 +24,21 @@ class LoginPage extends StatelessWidget {
     final String password = passwordController.text.trim();
 
     if (username.isEmpty || password.isEmpty) {
-      // Handle empty username or password
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Login Failed'),
+          content: Text('Please fill in all fields.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
       return;
     }
 
