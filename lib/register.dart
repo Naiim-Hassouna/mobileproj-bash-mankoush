@@ -94,16 +94,33 @@ class RegisterPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Register'),
+        backgroundColor: Colors.brown,
       ),
+      backgroundColor: const Color.fromRGBO(247, 205, 120, 100),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Text(
+              'WELCOME TO\nOUR APP!',
+              style: TextStyle(
+                color: Colors.brown,
+                fontWeight: FontWeight.bold,
+                fontSize: 30.0,
+              ),
+            ),
+            SizedBox(height: 35.0),
             TextField(
               controller: usernameController,
               decoration: InputDecoration(
                 labelText: 'Username',
+                labelStyle: TextStyle(color: Colors.brown),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.brown),
+                ),
               ),
             ),
             SizedBox(height: 16.0),
@@ -112,6 +129,12 @@ class RegisterPage extends StatelessWidget {
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Password',
+                labelStyle: TextStyle(color: Colors.brown),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.brown),
+                ),
               ),
             ),
             SizedBox(height: 16.0),
@@ -120,6 +143,12 @@ class RegisterPage extends StatelessWidget {
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Confirm Password',
+                labelStyle: TextStyle(color: Colors.brown),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.brown),
+                ),
               ),
             ),
             SizedBox(height: 24.0),
@@ -127,14 +156,20 @@ class RegisterPage extends StatelessWidget {
               onPressed: () {
                 registerUser(context);
               },
-              child: Text('Register'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                padding: EdgeInsets.all(12.0),
+              ),
+              child: Text('Register', style: TextStyle(fontSize: 16.0)),
             ),
             SizedBox(height: 12.0),
             TextButton(
               onPressed: () {
                 Navigator.pushReplacementNamed(context, '/login');
               },
-              child: Text('Already have an account? Login here'),
+              child: Text('Already have an account? Login here',
+                style: TextStyle(color: Colors.blue),
+              ),
             ),
           ],
         ),
